@@ -112,10 +112,7 @@ public class Mapper {
     // Group by city, then map each group to a Set of purchased categories (flattened per group)
     public Map<String, Set<String>> groupByCityMappingToCategories(List<Customer> customers) {
         return customers.stream()
-                .collect(groupingBy(Customer::city, mapping(Customer::purchasedCategories,
-                        collectingAndThen(toList(), sets -> sets.stream()
-                                .flatMap(Set::stream)
-                                .collect(toSet())))));
+                .collect(groupingBy(Customer::city, flatMapping(customer -> customer.purchasedCategories().stream(), toSet())));
     }
 
     // --- filtering() downstream collector ---
