@@ -119,6 +119,14 @@ public class MapperTest {
     }
 
     @Test
+    public void testGroupByCityJoiningNames() {
+        Map<String, String> result = mapper.groupByCityJoiningNames(customers);
+        assertEquals("Alice, Bob", result.get("Berlin"));
+        assertEquals("Carol, Dan", result.get("Paris"));
+        assertEquals("Anthony", result.get("Umeå"));
+    }
+
+    @Test
     public void testGroupByCitySortedUnmodifiableNames() {
         List<Customer> unordered = List.of(
                 new Customer("Bob", 17, false, List.of("bob@example.com"), "Berlin", Set.of("Toys")),

@@ -91,6 +91,12 @@ public class Mapper {
                 .collect(groupingBy(Customer::city, mapping(Customer::name, toList())));
     }
 
+    // Group customers by city and join names into one comma-separated string per city
+    public Map<String, String> groupByCityJoiningNames(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(Customer::city, mapping(Customer::name, joining(", "))));
+    }
+
     // Group by city and use collectingAndThen finisher to sort and freeze each city list
     public Map<String, List<String>> groupByCitySortedUnmodifiableNames(List<Customer> customers) {
         return customers.stream()
