@@ -1,5 +1,6 @@
 package org.example.mapping;
 
+import org.example.model.CityAggregate;
 import org.example.model.CityReport;
 import org.example.model.Customer;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -177,6 +179,21 @@ public class MapperTest {
         Map<String, Long> result = mapper.groupByCityCountingAdults(customers);
         assertEquals(1L, (long) result.get("Berlin"));
         assertEquals(2L, (long) result.get("Paris"));
+    }
+
+    @Test
+    public void testCityAggregates() {
+        List<Map<String, Object>> result = mapper.cityAggregates(customers);
+        List<Map<String, List<String>>> result1 = mapper.cityAggregates1(customers);
+        List<CityAggregate> result2 = mapper.cityAggregates2(customers);
+        List<CityAggregate> result3 = mapper.cityAggregates3(customers);
+
+        System.out.println("Result 1: " + result);
+        System.out.println("Result 2: " + result1);
+        System.out.println("Result 3: " + result2);
+        System.out.println("Result 4: " + result3);
+        assertEquals(3, result.size());
+
     }
 
 }

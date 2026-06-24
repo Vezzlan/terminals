@@ -1,9 +1,13 @@
 package org.example.mapping;
 
 
+import org.example.model.CityAggregate;
 import org.example.model.CityReport;
 import org.example.model.Customer;
+import org.example.model.CustomerCollections;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,5 +143,75 @@ public class Mapper {
     public Map<String, Long> groupByCityCountingAdults(List<Customer> customers) {
         return customers.stream()
                 .collect(groupingBy(Customer::city, filtering(c -> c.age() >= 18, counting())));
+    }
+
+
+    public Map<String, CustomerCollections> groupByCityNamesAndAverageAge(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(Customer::city, teeing(
+                        flatMapping(c -> c.emails().stream(), toList()),
+                        flatMapping(c -> c.purchasedCategories().stream(), toSet()),
+                        CustomerCollections::new)));
+    }
+
+    // Return a list of maps, where each map represents aggregated data per city
+    public List<Map<String, Object>> cityAggregates(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(Customer::city))
+                .entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> cityData = new HashMap<>();
+                    List<Customer> cityCustomers = entry.getValue();
+
+                    cityData.put("city", entry.getKey());
+                    cityData.put("names", cityCustomers.stream().map(Customer::name).toList());
+
+                    return cityData;
+                })
+                .toList();
+    }
+
+    public List<Map<String, List<String>>> cityAggregates1(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(Customer::city))
+                .entrySet().stream()
+                .map(entry -> {
+                    Map<String, List<String>> cityData = new HashMap<>();
+                    List<Customer> cityCustomers = entry.getValue();
+                    
+                    cityData.put("city", List.of(entry.getKey()));
+                    cityData.put("names", cityCustomers.stream().map(Customer::name).toList());
+                    
+                    return cityData;
+                })
+                .toList();
+    }
+
+    public List<CityAggregate> cityAggregates2(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(Customer::city))
+                .entrySet().stream()
+                .map(entry -> new CityAggregate(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .map(Customer::name)
+                                .toList()
+                ))
+                .toList();
+
+    }
+
+    public List<CityAggregate> cityAggregates3(List<Customer> customers) {
+        return customers.stream()
+                .collect(groupingBy(
+                        Customer::city,
+                        mapping(Customer::name, toList())
+                ))
+                .entrySet().stream()
+                .map(entry -> new CityAggregate(
+                        entry.getKey(),
+                        entry.getValue()
+                ))
+                .toList();
     }
 }
